@@ -9,7 +9,7 @@ import (
 type UtilityPaymentInput struct {
 	TransactionID    string  `json:"transid"`
 	UtilityCode      string  `json:"utilitycode"`
-	UtilityReference string  `json:"utilref"`
+	UtilityReference string  `json:"utilityref"`
 	Amount           float64 `json:"amount"`
 	Vendor           string  `json:"vendor"`
 	Pin              string  `json:"pin"`
