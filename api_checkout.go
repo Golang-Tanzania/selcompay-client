@@ -86,8 +86,10 @@ type OrderInputMinimal struct {
 	Expiry          int    `json:"expiry,omitempty"`
 }
 
-// CreateOrderMinimal creates a payment order request to the selcom payment gateway.
-// This is for non-card payments. Ideal for mobile wallet push payments and manual payments.
+// CreateOrderMinimal initiates a payment order request to the Selcom payment gateway.
+// This method is intended for non-card payments such as mobile wallet push payments
+// and manual payment methods. If a webhook URL is provided, it is base64-encoded
+// as required by the API.
 func (cln *Client) CreateOrderMinimal(ctx context.Context, order OrderInputMinimal) (Response, error) {
 	url := fmt.Sprintf("%s/%s/checkout/create-order-minimal", cln.host, version)
 
@@ -104,7 +106,8 @@ func (cln *Client) CreateOrderMinimal(ctx context.Context, order OrderInputMinim
 	return resp, nil
 }
 
-// CancelOrder Cancels an order before customer completes the payment.
+// CancelOrder cancels a payment order before the customer completes the payment.
+// It sends a DELETE request to the Selcom checkout API using the provided order ID.
 func (cln *Client) CancelOrder(ctx context.Context, orderID string) (Response, error) {
 	url := fmt.Sprintf("%s/%s/checkout/cancel-order", cln.host, version)
 
@@ -122,7 +125,8 @@ func (cln *Client) CancelOrder(ctx context.Context, orderID string) (Response, e
 	return resp, nil
 }
 
-// CheckOrder returns status of the order.
+// CheckOrder retrieves the current status of a payment order from the Selcom checkout API.
+// It sends a GET request using the provided order ID.
 func (cln *Client) CheckOrder(ctx context.Context, orderID string) (Response, error) {
 	url := fmt.Sprintf("%s/%s/checkout/order-status?order_id=%s", cln.host, version, orderID)
 
@@ -140,7 +144,8 @@ func (cln *Client) CheckOrder(ctx context.Context, orderID string) (Response, er
 	return resp, nil
 }
 
-// Orders returns a list of orders, satisfying the startDate and endDate params.
+// Orders retrieves a list of orders from the Selcom checkout API within the specified date range.
+// It uses the provided start and end dates to filter the results.
 func (cln *Client) Orders(ctx context.Context, startDate string, endDate string) (Response, error) {
 	url := fmt.Sprintf("%s/%s/checkout/list-orders?fromdate=%s&todate=%s", cln.host, version, startDate, endDate)
 
@@ -160,8 +165,8 @@ func (cln *Client) Orders(ctx context.Context, startDate string, endDate string)
 	return resp, nil
 }
 
-// FetchStoredCards retursn the stored billing cards for the provided buyer.
-// The gatewayBuyerUUID is generated for each user on their first order creation.
+// FetchStoredCards retrieves the stored billing cards for the specified buyer.
+// The gatewayBuyerUUID is a unique identifier generated for the user upon their first order creation.
 func (cln *Client) FetchStoredCards(ctx context.Context, buyerUserID string, gatewayBuyerUUID string) (Response, error) {
 	url := fmt.Sprintf("%s/%s/checkout/stored-cards", cln.host, version)
 
@@ -181,7 +186,8 @@ func (cln *Client) FetchStoredCards(ctx context.Context, buyerUserID string, gat
 	return resp, nil
 }
 
-// DeleteStoredCard deletes the provided billing card informations.
+// DeleteStoredCard removes a previously saved billing card from the Selcom gateway.
+// It uses the card's resource ID and the associated gatewayBuyerUUID to identify the card.
 func (cln *Client) DeleteStoredCard(ctx context.Context, cardResourceID string, gatewayBuyerUUID string) (Response, error) {
 	url := fmt.Sprintf("%s/%s/checkout/delete-card?id=%s&gateway_buyer_uuid=%s", cln.host, version, cardResourceID, gatewayBuyerUUID)
 
@@ -201,6 +207,8 @@ func (cln *Client) DeleteStoredCard(ctx context.Context, cardResourceID string, 
 	return resp, nil
 }
 
+// CardPaymentInput represents the payload required to initiate a card payment
+// using a stored card through the Selcom payment gateway.
 type CardPaymentInput struct {
 	TransactionID    string `json:"transid"`
 	Vendor           string `json:"vendor"`
@@ -210,8 +218,9 @@ type CardPaymentInput struct {
 	GatewayBuyerUUID string `json:"gateway_buyer_uuid"`
 }
 
-// CardPayment allows the ecommerce website to process an order using stored cards directly
-// without redirecting the user to payment gateway page.
+// CardPayment processes an order using a stored billing card without redirecting
+// the user to the Selcom payment gateway page.
+// This is intended for seamless in-app or on-site card payments.
 func (cln *Client) CardPayment(ctx context.Context, cardPaymentInput CardPaymentInput) (Response, error) {
 	url := fmt.Sprintf("%s/%s/checkout/card-payment", cln.host, version)
 
@@ -223,8 +232,10 @@ func (cln *Client) CardPayment(ctx context.Context, cardPaymentInput CardPayment
 	return resp, nil
 }
 
-// WalletPayment  api allows the ecommerce website to process an order using mobile wallets directly.
-// trigger this api call to reiceve a PUSH ussd.
+// WalletPayment initiates a mobile wallet payment for the specified order.
+// This API triggers a USSD push (STK push) to the customer's phone to authorize the payment.
+// It is intended for seamless integration of mobile wallet payments (e.g., M-Pesa, Tigo Pesa).
+
 func (cln *Client) WalletPayment(ctx context.Context, transactionID string, orderID string, phone string) (Response, error) {
 	url := fmt.Sprintf("%s/%s/checkout/wallet-payment", cln.host, version)
 

@@ -6,6 +6,8 @@ import (
 	"net/http"
 )
 
+// UtilityPaymentInput represents the data required to process a utility payment
+// through the Selcom payment gateway.
 type UtilityPaymentInput struct {
 	TransactionID    string  `json:"transid"`
 	UtilityCode      string  `json:"utilitycode"`
@@ -16,7 +18,8 @@ type UtilityPaymentInput struct {
 	Phone            string  `json:"msisdn"`
 }
 
-// UtilityPayment process payment for a particular payment service.
+// UtilityPayment process payment for a particular payment service.// UtilityPayment processes a payment for a specified utility service.
+// The payment details are provided in the UtilityPaymentInput parameter.
 func (cln *Client) UtilityPayment(ctx context.Context, body UtilityPaymentInput) (Response, error) {
 	url := fmt.Sprintf("%s/%s/utilitypayment/process", cln.host, version)
 
@@ -27,6 +30,10 @@ func (cln *Client) UtilityPayment(ctx context.Context, body UtilityPaymentInput)
 
 	return resp, nil
 }
+
+// UtilityLookup retrieves information related to a specific utility payment.
+// It queries the utility payment service using the utility code, utility reference,
+// and transaction ID to validate or fetch details before processing a payment.
 
 func (cln *Client) UtilityLookup(ctx context.Context, utilityCode, utilityRef, transactionID string) (Response, error) {
 	url := fmt.Sprintf("%s/%s/utilitypayment/lookup?utilitycode=%s&utilityref=%s&transid=%s", cln.host, version, utilityCode, utilityRef, transactionID)
@@ -49,7 +56,8 @@ func (cln *Client) UtilityLookup(ctx context.Context, utilityCode, utilityRef, t
 	return resp, nil
 }
 
-// UtilityPaymentStatus checks ths status of the utility payment.
+// UtilityPaymentStatus checks the current status of a utility payment
+// by querying the utility payment service with the provided transaction ID.
 func (cln *Client) UtilityPaymentStatus(ctx context.Context, trasactionID string) (Response, error) {
 	url := fmt.Sprintf("%s/%s/utilitypayment/query?transid=%s", cln.host, version, trasactionID)
 
