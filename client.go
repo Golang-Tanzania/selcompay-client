@@ -118,9 +118,6 @@ func do(ctx context.Context, cln *Client, method string, url string, body any) (
 		return nil, err
 	}
 
-	// Log the Headers (Testing)
-	cln.log(ctx, fmt.Sprintf("%v", req.Header))
-
 	resp, err := cln.http.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("do: error: %w", err)

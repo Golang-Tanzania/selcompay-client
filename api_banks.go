@@ -10,10 +10,20 @@ import (
 // It performs a GET request to the QwikSend lookup endpoint using the provided bank code,
 // account number, and transaction ID.
 func (cln *Client) BankLookup(ctx context.Context, bank, account, transactionId string) (Response, error) {
-	url := fmt.Sprintf("%s/%s/qwiksend/lookup/?bank=%s&account=%s&transid=%s", cln.host, version, bank, account, transactionId)
+	url := fmt.Sprintf("%s/%s/qwiksend/lookup?bank=%s&account=%s&transid=%s", cln.host, version, bank, account, transactionId)
+
+	var body = struct {
+		TransactionID string `json:"transid"`
+		Bank          string `json:"bank"`
+		Account       string `json:"account"`
+	}{
+		TransactionID: transactionId,
+		Bank:          bank,
+		Account:       account,
+	}
 
 	var resp Response
-	if err := cln.do(ctx, http.MethodGet, url, nil, &resp); err != nil {
+	if err := cln.do(ctx, http.MethodGet, url, body, &resp); err != nil {
 		return Response{}, err
 	}
 
