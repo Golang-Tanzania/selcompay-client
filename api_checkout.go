@@ -119,7 +119,7 @@ func (cln *Client) CancelOrder(ctx context.Context, orderID string) (Response, e
 
 	var resp Response
 	if err := cln.do(ctx, http.MethodDelete, url, body, &resp); err != nil {
-		return Response{}, nil
+		return Response{}, err
 	}
 
 	return resp, nil
@@ -180,7 +180,7 @@ func (cln *Client) FetchStoredCards(ctx context.Context, buyerUserID string, gat
 
 	var resp Response
 	if err := cln.do(ctx, http.MethodPost, url, body, &resp); err != nil {
-		return Response{}, nil
+		return Response{}, err
 	}
 
 	return resp, nil
